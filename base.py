@@ -1,7 +1,8 @@
 import pygame as pg
 
-pg.init()
+import barrinha # importando o arquivo da barrinha
 
+<<<<<<< HEAD
 x = 893
 y = 1000
 size = (x, y)
@@ -12,6 +13,33 @@ screen = pg.display.set_mode(size)
 pg.display.set_caption("Breakout game")
 
 # para controlar o tempo
+=======
+pg.init()
+pg.mixer.init()
+
+# definindo largura e altura da tela
+X = 800
+Y = 700
+
+# definindo cores
+AZUL = (0, 97, 148)
+PRETO = (0, 0, 0)
+
+lista_sprites = pg.sprite.Group()
+
+# define a janela
+screen = pg.display.set_mode((X, Y))
+pg.display.set_caption("Breakout game")
+
+# testando a barrinha
+LARGURA_BARRINHA = 108
+ALTURA_BARRINHA  = 20
+barra = barrinha.Barrinha(AZUL)
+barra.rect.x = X // 2 - LARGURA_BARRINHA // 2
+barra.rect.y = Y - 65
+
+lista_sprites.add(barra)
+>>>>>>> b7e3a7a2c8259250701ef6f5ee8b6a4f90a2e5ee
 
 clock = pg.time.Clock()
 FPS = 60
@@ -81,13 +109,19 @@ def main():
         if event.type == pg.QUIT:
             running = False
 
+<<<<<<< HEAD
     all_sprites_list.update()
 
     screen.fill(BLACK)
 
     pg.draw.line(screen, GREY, [0, 19], [WIDTH, 19], 40)
 
+=======
+    screen.fill(PRETO)
+    lista_sprites.draw(screen)
+    pg.display.update()
+>>>>>>> b7e3a7a2c8259250701ef6f5ee8b6a4f90a2e5ee
     pg.display.flip()
-
+    
 # finaliza o pygame
 pg.quit()
