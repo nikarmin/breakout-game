@@ -1,5 +1,7 @@
 import pygame as pg
+import bolinha as bola
 
+# pegando as teclas
 from pygame.locals import (
     K_UP, K_DOWN, K_LEFT, K_RIGHT,
     K_ESCAPE, KEYDOWN, QUIT, K_SPACE
@@ -32,7 +34,7 @@ screen = pg.display.set_mode(size)
 pg.display.set_caption("Breakout Game")
 
 # definindo fonte
-fonte = pg.font.Font('assets/font_bit.ttf', 30)
+fonte = pg.font.Font('assets/bit.ttf', 30)
 
 # menu - sair
 txtSair = fonte.render('Sair', False, (255, 255, 255), (0, 0, 0))
@@ -45,8 +47,7 @@ pJogar = (screen.get_width() / 2 - txtJogar.get_width() / 2, (screen.get_height(
 btnJogar = txtJogar.get_rect(topleft=pJogar)
 
 # menu - logo
-
-fonte = pg.font.Font('assets/font_bit.ttf', 50)
+fonte = pg.font.Font('assets/bit.ttf', 50)
 
 txtLogo = fonte.render('BreakOut', False, (255, 255, 255), (0, 0, 0))
 pLogo = screen.get_width() / 2 - txtLogo.get_width() / 2, screen.get_height() / 3  - txtLogo.get_height() / 2
@@ -57,8 +58,6 @@ ALTURA_BARRINHA  = 20
 barra = barrinha.Barrinha(AZUL)
 barra.rect.x = X // 2 - LARGURA_BARRINHA // 2
 barra.rect.y = Y - 65
-
-lista_sprites.add(barra)
 
 clock = pg.time.Clock()
 FPS = 60
@@ -83,7 +82,15 @@ x_gap = 7
 y_gap = 5
 wall_width = 16
 
-# método da main do jogo
+# definindo bolinha
+bolinha = bola.Bolinha(RED, 10, 10)
+bolinha.rect.x = Y
+bolinha.rect.y = X
+    
+# adicionando nas sprites
+
+lista_sprites.add(barra)
+lista_sprites.add(bolinha)
 
 def main():
     running = True
@@ -98,6 +105,7 @@ def main():
                     if event.button == 1:
                         if btnJogar.collidepoint(event.pos):
                             jogar()
+                            running = False
                             #print('Botão "jogar" apertado!')
                             # colocar evento para iniciar a partida
                         if btnSair.collidepoint(event.pos):
@@ -120,7 +128,6 @@ def main():
     pg.quit()
 
 # método 'jogar'
-    
 def jogar():
     running = True
     clock.tick(FPS)
@@ -143,6 +150,24 @@ def jogar():
         pg.display.flip()
     
     # finaliza o pygame
-    pg.quit()
 
-main()
+# método 'perdeu'
+    
+def perdeu():
+    # arrumar
+    screen.fill(PRETO)
+    fonte = pg.font.Font('assets/minecraft.ttf', 100)
+    txtPerdeu = fonte.render('Voce perdeu!', False, (255, 0, 0), (0, 0, 0))
+    pPerdeu = (screen.get_width() / 2 - txtPerdeu.get_width() / 2, (screen.get_height() * 2) / 4 - txtPerdeu.get_height() / 2)
+
+    # usuário escolher se quer retornar ou sair
+
+    screen.blit(txtPerdeu, pPerdeu)
+    screen.blit(txtSair, pSair)
+    screen.blit(txtJogar, pJogar)
+
+    pg.display.update()
+    pg.display.flip()
+
+if __name__ == '__main__':
+    main()
