@@ -83,7 +83,7 @@ y_gap = 5
 wall_width = 16
 
 # definindo bolinha
-bolinha = bola.Bolinha(RED, 10, 10)
+bolinha = bola.Bolinha((212, 210, 212), 10, 10)
 bolinha.rect.x = Y
 bolinha.rect.y = X
     
@@ -110,16 +110,10 @@ def main():
                             # colocar evento para iniciar a partida
                         if btnSair.collidepoint(event.pos):
                             running = False
-        
-        #lista_sprites.update()
-                            
+    
         screen.blit(txtLogo, pLogo)
         screen.blit(txtJogar, pJogar)
         screen.blit(txtSair, pSair)
-
-        #pg.draw.line(screen, GREY, [0, 19], [X, 19], 40)
-
-        #lista_sprites.draw(screen)
 
         pg.display.update()
         pg.display.flip()

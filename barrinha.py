@@ -1,7 +1,5 @@
 import pygame as pg
 
-pg.init()
-
 largura_barrinha = 108
 altura_barrinha  = 20
 
