@@ -9,8 +9,8 @@ from pygame.locals import (
 
 import barrinha # importando o arquivo da barrinha
 
-pg.init()
-pg.mixer.init()
+pg.init()       # iniciando o jogo
+pg.mixer.init() # iniciando o mixer (para sons)
 
 # definindo largura e altura da tela
 X = 800
@@ -20,12 +20,12 @@ size = (X, Y)
 # definindo cores
 AZUL = (0, 97, 148)
 PRETO = (0, 0, 0)
-WHITE = (255, 255, 255)
-GREY = (212, 210, 212)
-RED = (162, 8, 0)
-ORANGE = (183, 119, 0)
-GREEN = (0, 127, 33)
-YELLOW = (197, 199, 37)
+BRANCO = (255, 255, 255)
+CINZA = (212, 210, 212)
+VERMELHO = (162, 8, 0)
+LARANJA = (183, 119, 0)
+VERDE = (0, 127, 33)
+AMARELO = (197, 199, 37)
 
 lista_sprites = pg.sprite.Group()
 
@@ -55,7 +55,7 @@ pLogo = screen.get_width() / 2 - txtLogo.get_width() / 2, screen.get_height() / 
 # testando a barrinha
 LARGURA_BARRINHA = 108
 ALTURA_BARRINHA  = 20
-barra = barrinha.Barrinha(AZUL)
+barra = barrinha.Barrinha(AZUL, LARGURA_BARRINHA, ALTURA_BARRINHA)
 barra.rect.x = X // 2 - LARGURA_BARRINHA // 2
 barra.rect.y = Y - 65
 
@@ -71,8 +71,6 @@ class Brick(pg.sprite.Sprite):
         self.image = pg.Surface([width, height])
         pg.draw.rect(self.image, color, [0, 0, width, height])
         self.rect = self.image.get_rect()
-
-# CLASSE DA BOLA
 
 
 # altura e largura dos tijolinhos
@@ -132,11 +130,16 @@ def jogar():
             if event.type == pg.QUIT:
                 running = False
             if event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
+                tecla = event.key
+                if tecla == K_ESCAPE:
                     running = False
+                if tecla == K_RIGHT:
+                    barra.irParaDireita(10)
+                if tecla == K_LEFT:
+                    barra.irParaEsquerda(10)
         
         lista_sprites.update()
-        pg.draw.line(screen, GREY, [0, 19], [X, 19], 40)
+        pg.draw.line(screen, CINZA, [0, 19], [X, 19], 40)
 
         lista_sprites.draw(screen)
 
