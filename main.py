@@ -69,9 +69,9 @@ FPS = 60
 
 # CLASSE DOS TIJOLOS
 
-velocity = 1
+velocity = -4
 
-# pg.draw.line(screen, CINZA, [0, 19], [X, 19], 40)
+# CLASSE DA BOLINHA
 
 
 class Ball(pg.sprite.Sprite):
