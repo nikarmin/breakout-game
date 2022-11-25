@@ -130,13 +130,15 @@ def jogar():
             if event.type == pg.QUIT:
                 running = False
             if event.type == KEYDOWN:
-                tecla = event.key
-                if tecla == K_ESCAPE:
+                if event.key == K_ESCAPE:
                     running = False
-                if tecla == K_RIGHT:
-                    barra.irParaDireita(10)
-                if tecla == K_LEFT:
-                    barra.irParaEsquerda(10)
+
+
+        teclas = pg.key.get_pressed()
+        if teclas[pg.K_LEFT]:
+            barra.irParaEsquerda(1)
+        if teclas[pg.K_RIGHT]:
+            barra.irParaDireita(1, X)
         
         lista_sprites.update()
         pg.draw.line(screen, CINZA, [0, 19], [X, 19], 40)
