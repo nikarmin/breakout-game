@@ -69,7 +69,7 @@ FPS = 60
 
 # CLASSE DOS TIJOLOS
 
-velocity = -4
+velocity = 1
 
 # CLASSE DA BOLINHA
 
@@ -82,7 +82,7 @@ class Ball(pg.sprite.Sprite):
         pg.draw.rect(self.image, color, [
                      0, 0, width, height], border_radius=100)
         self.rect = self.image.get_rect()
-        self.velocity = [1, 1]
+        self.velocity = [velocity, velocity]
 
     def update(self):
         self.rect.x += self.velocity[0]
@@ -90,7 +90,7 @@ class Ball(pg.sprite.Sprite):
 
     def bounce(self):
         self.velocity[0] = self.velocity[0]
-        self.velocity[1] = -self.velocity[-8, 8]
+        self.velocity[1] = -self.velocity[1]
 
 
 # definindo bolinha
@@ -114,7 +114,7 @@ brick_height = 16
 x_gap = 7
 y_gap = 5
 wall_width = 16
-
+balls = 1
 # adicionando nas sprites
 
 lista_sprites.add(barra)
@@ -137,7 +137,7 @@ def main():
             if event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if btnJogar.collidepoint(event.pos):
-                        jogar()
+                        jogar(balls)
                         running = False
                         #print('Botão "jogar" apertado!')
                         # colocar evento para iniciar a partida
@@ -153,7 +153,7 @@ def main():
 # método 'jogar'
 
 
-def jogar():
+def jogar(balls):
     running = True
     clock.tick(FPS)
     while running:
@@ -173,19 +173,47 @@ def jogar():
         if teclas[pg.K_RIGHT]:
             barra.irParaDireita(1, X)
 
-        if bolinha.rect.x >= 790:
-            bolinha.velocity[0] = -bolinha.velocity[0]
-        if bolinha.rect.x <= 0:
-            bolinha.velocity[0] = -bolinha.velocity[0]
-        if bolinha.rect.y > 590:
-            bolinha.velocity[1] = -bolinha.velocity[1]
         if bolinha.rect.y < 40:
             bolinha.velocity[1] = -bolinha.velocity[1]
 
+        if bolinha.rect.x >= X - wall_width - 10:
+            bolinha.velocity[0] = -bolinha.velocity[0]
+
+        if bolinha.rect.x <= wall_width:
+            bolinha.velocity[0] = -bolinha.velocity[0]
+
+        if bolinha.rect.y > Y:
+            bolinha.rect.x = X // 2 - 5
+            bolinha.rect.y = Y // 2 - 5
+            bolinha.velocity[1] = bolinha.velocity[1]
+            balls += 1
+            if balls == 4:
+                font = pg.font.Font('assets/minecraft.ttf', 70)
+                text = font.render("GAME OVER", 1, BRANCO)
+                text_rect = text.get_rect(center=(X / 2, Y / 2))
+                screen.blit(text, text_rect)
+                pg.display.update()
+                pg.time.wait(2000)
+                run = False
+
         if pg.sprite.collide_mask(bolinha, barra):
-            bolinha.rect.x -= bolinha.velocity[0]
+            bolinha.rect.x += bolinha.velocity[0]
             bolinha.rect.y -= bolinha.velocity[1]
             bolinha.bounce()
+
+        # if bolinha.rect.x >= 790:
+        #     bolinha.velocity[0] = -bolinha.velocity[0]
+        # if bolinha.rect.x <= 0:
+        #     bolinha.velocity[0] = -bolinha.velocity[0]
+        # if bolinha.rect.y > 590:
+        #     bolinha.velocity[1] = -bolinha.velocity[1]
+        # if bolinha.rect.y < 40:
+        #     bolinha.velocity[1] = -bolinha.velocity[1]
+
+        # if pg.sprite.collide_mask(bolinha, barra):
+        #     bolinha.rect.x -= bolinha.velocity[0]
+        #     bolinha.rect.y -= bolinha.velocity[1]
+        #     bolinha.bounce()
 
         pg.draw.line(screen, CINZA, [0, 19], [X, 19], 40)
 
