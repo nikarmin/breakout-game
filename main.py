@@ -69,32 +69,8 @@ FPS = 60
 
 # CLASSE DOS TIJOLOS
 
-velocity = 1
-
-# CLASSE DA BOLINHA
-
-
-class Ball(pg.sprite.Sprite):
-
-    def __init__(self, color, width, height):
-        super().__init__()
-        self.image = pg.Surface([width, height])
-        pg.draw.rect(self.image, color, [
-                     0, 0, width, height], border_radius=100)
-        self.rect = self.image.get_rect()
-        self.velocity = [velocity, velocity]
-
-    def update(self):
-        self.rect.x += self.velocity[0]
-        self.rect.y += self.velocity[1]
-
-    def bounce(self):
-        self.velocity[0] = self.velocity[0]
-        self.velocity[1] = -self.velocity[1]
-
-
 # definindo bolinha
-bolinha = Ball(VERMELHO, 20, 20)
+bolinha = bolinha.Bolinha((221, 142, 0), 20, 20)
 bolinha.rect.x = X // 2 - 5
 bolinha.rect.y = Y // 2 - 5
 
@@ -114,7 +90,7 @@ brick_height = 16
 x_gap = 7
 y_gap = 5
 wall_width = 16
-balls = 1
+bolas = 1
 # adicionando nas sprites
 
 lista_sprites.add(barra)
@@ -137,7 +113,7 @@ def main():
             if event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if btnJogar.collidepoint(event.pos):
-                        jogar(balls)
+                        jogar(bolas)
                         running = False
                         #print('Botão "jogar" apertado!')
                         # colocar evento para iniciar a partida
@@ -151,11 +127,19 @@ def main():
     pg.quit()
 
 # método 'jogar'
+    
 
 
-def jogar(balls):
+def jogar(bolas):
     running = True
     clock.tick(FPS)
+
+    font = pg.font.Font('assets/minecraft.ttf', 20)
+    string = "bolas : " + str(bolas)
+    contBolas = font.render(string, True, BRANCO, (0,0,0))
+    contBolas_posicao = contBolas.get_rect()
+    contBolas_posicao.center = (50, 360)
+
     while running:
         screen.fill(PRETO)
         for event in pg.event.get():
@@ -166,6 +150,8 @@ def jogar(balls):
                     running = False
 
         lista_sprites.update()
+
+       
 
         teclas = pg.key.get_pressed()
         if teclas[pg.K_LEFT]:
@@ -186,36 +172,26 @@ def jogar(balls):
             bolinha.rect.x = X // 2 - 5
             bolinha.rect.y = Y // 2 - 5
             bolinha.velocity[1] = bolinha.velocity[1]
-            balls += 1
-            if balls == 4:
+            bolas += 1
+            if bolas == 4:
                 font = pg.font.Font('assets/minecraft.ttf', 70)
                 text = font.render("GAME OVER", 1, BRANCO)
                 text_rect = text.get_rect(center=(X / 2, Y / 2))
                 screen.blit(text, text_rect)
                 pg.display.update()
                 pg.time.wait(2000)
-                run = False
+                # perdeu()
 
         if pg.sprite.collide_mask(bolinha, barra):
             bolinha.rect.x += bolinha.velocity[0]
             bolinha.rect.y -= bolinha.velocity[1]
-            bolinha.bounce()
-
-        # if bolinha.rect.x >= 790:
-        #     bolinha.velocity[0] = -bolinha.velocity[0]
-        # if bolinha.rect.x <= 0:
-        #     bolinha.velocity[0] = -bolinha.velocity[0]
-        # if bolinha.rect.y > 590:
-        #     bolinha.velocity[1] = -bolinha.velocity[1]
-        # if bolinha.rect.y < 40:
-        #     bolinha.velocity[1] = -bolinha.velocity[1]
-
-        # if pg.sprite.collide_mask(bolinha, barra):
-        #     bolinha.rect.x -= bolinha.velocity[0]
-        #     bolinha.rect.y -= bolinha.velocity[1]
-        #     bolinha.bounce()
+            bolinha.balancar()
 
         pg.draw.line(screen, CINZA, [0, 19], [X, 19], 40)
+
+        string = "bolas : " + str(bolas)
+        contBolas = font.render(string, True, BRANCO, (0,0,0))
+        screen.blit(contBolas, contBolas_posicao)
 
         lista_sprites.draw(screen)
 
