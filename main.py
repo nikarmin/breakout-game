@@ -127,7 +127,6 @@ def main():
     pg.quit()
 
 # método 'jogar'
-    
 
 
 def jogar(bolas):
@@ -136,7 +135,7 @@ def jogar(bolas):
 
     font = pg.font.Font('assets/minecraft.ttf', 20)
     string = "bolas : " + str(bolas)
-    contBolas = font.render(string, True, BRANCO, (0,0,0))
+    contBolas = font.render(string, True, BRANCO, (0, 0, 0))
     contBolas_posicao = contBolas.get_rect()
     contBolas_posicao.center = (50, 360)
 
@@ -150,8 +149,6 @@ def jogar(bolas):
                     running = False
 
         lista_sprites.update()
-
-       
 
         teclas = pg.key.get_pressed()
         if teclas[pg.K_LEFT]:
@@ -175,12 +172,14 @@ def jogar(bolas):
             bolas += 1
             if bolas == 4:
                 font = pg.font.Font('assets/minecraft.ttf', 70)
-                text = font.render("GAME OVER", 1, BRANCO)
-                text_rect = text.get_rect(center=(X / 2, Y / 2))
+                text = font.render("Voce perdeu!", 1, VERMELHO)
+                text_rect = text.get_rect(center=(X / 2, Y / 3))
                 screen.blit(text, text_rect)
+                screen.blit(txtSair, pSair)
+                screen.blit(txtJogar, pJogar)
                 pg.display.update()
                 pg.time.wait(2000)
-                # perdeu()
+                pg.quit()
 
         if pg.sprite.collide_mask(bolinha, barra):
             bolinha.rect.x += bolinha.velocity[0]
@@ -190,7 +189,7 @@ def jogar(bolas):
         pg.draw.line(screen, CINZA, [0, 19], [X, 19], 40)
 
         string = "bolas : " + str(bolas)
-        contBolas = font.render(string, True, BRANCO, (0,0,0))
+        contBolas = font.render(string, True, BRANCO, (0, 0, 0))
         screen.blit(contBolas, contBolas_posicao)
 
         lista_sprites.draw(screen)
@@ -199,26 +198,6 @@ def jogar(bolas):
         pg.display.flip()
 
     # finaliza o pygame
-
-# método 'perdeu'
-
-
-def perdeu():
-    # arrumar
-    screen.fill(PRETO)
-    fonte = pg.font.Font('assets/minecraft.ttf', 100)
-    txtPerdeu = fonte.render('Voce perdeu!', False, (255, 0, 0), (0, 0, 0))
-    pPerdeu = (screen.get_width() / 2 - txtPerdeu.get_width() / 2,
-               (screen.get_height() * 2) / 4 - txtPerdeu.get_height() / 2)
-
-    # usuário escolher se quer retornar ou sair
-
-    screen.blit(txtPerdeu, pPerdeu)
-    screen.blit(txtSair, pSair)
-    screen.blit(txtJogar, pJogar)
-
-    pg.display.update()
-    pg.display.flip()
 
 
 if __name__ == '__main__':
