@@ -67,8 +67,6 @@ barra.rect.y = Y - 65
 clock = pg.time.Clock()
 FPS = 60
 
-# CLASSE DOS TIJOLOS
-
 # definindo bolinha
 bolinha = bolinha.Bolinha((221, 142, 0), 20, 20)
 bolinha.rect.x = X // 2 - 5
@@ -96,6 +94,68 @@ bolas = 1
 lista_sprites.add(barra)
 lista_sprites.add(bolinha)
 
+# sprite pros tijolinhos
+
+all_bricks = pygame.sprite.Group()
+
+def bricks():
+    for j in range(8):
+        for i in range(14):
+            if j < 2:
+                if i == 0:
+                    brick = Brick(RED, brick_width, brick_height)
+                    brick.rect.x = wall_width
+                    brick.rect.y = 215 + j * (y_gap + brick_height)
+                    lista_sprites(brick)
+                    all_bricks.add(brick)
+                else:
+                    brick = Brick(RED, brick_width, brick_height)
+                    brick.rect.x = wall_width + brick_width + x_gap + (i - 1) * (brick_width + x_gap)
+                    brick.rect.y = 215 + j * (y_gap + brick_height)
+                    lista_sprites(brick)
+                    all_bricks.add(brick)
+            if 1 < j < 4:
+                if i == 0:
+                    brick = Brick(ORANGE, brick_width, brick_height)
+                    brick.rect.x = wall_width
+                    brick.rect.y = 215 + j * (y_gap + brick_height)
+                    lista_sprites.add(brick)
+                    all_bricks.add(brick)
+                else:
+                    brick = Brick(ORANGE, brick_width, brick_height)
+                    brick.rect.x = wall_width + brick_width + x_gap + (i - 1) * (brick_width + x_gap)
+                    brick.rect.y = 215 + j * (y_gap + brick_height)
+                    lista_sprites.add(brick)
+                    all_bricks.add(brick)
+            if 3 < j < 6:
+                if i == 0:
+                    brick = Brick(GREEN, brick_width, brick_height)
+                    brick.rect.x = wall_width
+                    brick.rect.y = 215 + j * (y_gap + brick_height)
+                    lista_sprites.add(brick)
+                    all_bricks.add(brick)
+                else:
+                    brick = Brick(GREEN, brick_width, brick_height)
+                    brick.rect.x = wall_width + brick_width + x_gap + (i - 1) * (brick_width + x_gap)
+                    brick.rect.y = 215 + j * (y_gap + brick_height)
+                    lista_sprites.add(brick)
+                    all_bricks.add(brick)
+            if 5 < j < 8:
+                if i == 0:
+                    brick = Brick(YELLOW, brick_width, brick_height)
+                    brick.rect.x = wall_width
+                    brick.rect.y = 215 + j * (y_gap + brick_height)
+                    lista_sprites(brick)
+                    all_bricks.add(brick)
+                else:
+                    brick = Brick(YELLOW, brick_width, brick_height)
+                    brick.rect.x = wall_width + brick_width + x_gap + (i - 1) * (brick_width + x_gap)
+                    brick.rect.y = 215 + j * (y_gap + brick_height)
+                    lista_sprites(brick)
+                    all_bricks.add(brick)
+
+
+brick_wall = bricks()
 
 def main():
     running = True
