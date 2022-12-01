@@ -1,14 +1,13 @@
 import pygame as pg
-import bolinha
-from random import randint
+import bolinha   # importando o arquivo da bolinha
+import barrinha  # importando o arquivo da barrinha
+import tijolo    # importando o arquivo dos tijolos
 
 # pegando as teclas
 from pygame.locals import (
     K_UP, K_DOWN, K_LEFT, K_RIGHT,
     K_ESCAPE, KEYDOWN, QUIT, K_SPACE
 )
-
-import barrinha  # importando o arquivo da barrinha
 
 pg.init()       # iniciando o jogo
 pg.mixer.init()  # iniciando o mixer (para sons)
@@ -28,6 +27,11 @@ LARANJA = (183, 119, 0)
 VERDE = (0, 127, 33)
 AMARELO = (197, 199, 37)
 
+pontuacao = 0 # pontuacao do jogo
+velocity = 4
+bolas = 1
+
+# definindo o grupo das sprites que serão exibidas na tela
 lista_sprites = pg.sprite.Group()
 
 # define a janela
@@ -56,46 +60,92 @@ txtLogo = fonte.render('BreakOut', False, (255, 255, 255), (0, 0, 0))
 pLogo = screen.get_width() / 2 - txtLogo.get_width() / \
     2, screen.get_height() / 3 - txtLogo.get_height() / 2
 
-# testando a barrinha
+# definindo a barrinha
 LARGURA_BARRINHA = 108
 ALTURA_BARRINHA = 20
 barra = barrinha.Barrinha(AZUL, LARGURA_BARRINHA, ALTURA_BARRINHA)
 barra.rect.x = X // 2 - LARGURA_BARRINHA // 2
 barra.rect.y = Y - 65
 
-
 clock = pg.time.Clock()
 FPS = 60
-
-# CLASSE DOS TIJOLOS
 
 # definindo bolinha
 bolinha = bolinha.Bolinha((221, 142, 0), 20, 20)
 bolinha.rect.x = X // 2 - 5
 bolinha.rect.y = Y // 2 - 5
 
-
-class Brick(pg.sprite.Sprite):
-
-    def __init__(self, color, width, height):
-        super().__init__()
-        self.image = pg.Surface([width, height])
-        pg.draw.rect(self.image, color, [0, 0, width, height])
-        self.rect = self.image.get_rect()
-
+# definindo a lista de tijolos
+lista_tijolos = pg.sprite.Group()
 
 # altura e largura dos tijolinhos
-brick_width = 55
-brick_height = 16
+LARGURA_TIJOLO = 55
+ALTURA_TIJOLO  = 16
 x_gap = 7
 y_gap = 5
-wall_width = 16
-bolas = 1
-# adicionando nas sprites
+LARGURA_PAREDE = 16
 
+def bricks():
+    for coluna in range(8):
+        for linha in range(14):
+            if coluna < 2:
+                if linha == 0:
+                    brick = tijolo.Tijolo(VERMELHO, LARGURA_TIJOLO, ALTURA_TIJOLO)
+                    brick.rect.x = LARGURA_PAREDE
+                    brick.rect.y = 215 + coluna * (y_gap + ALTURA_TIJOLO)
+                    lista_sprites.add(brick)
+                    lista_tijolos.add(brick)
+                else:
+                    brick = tijolo.Tijolo(VERMELHO, LARGURA_TIJOLO, ALTURA_TIJOLO)
+                    brick.rect.x = LARGURA_PAREDE + LARGURA_TIJOLO + x_gap + (linha - 1) * (LARGURA_TIJOLO + x_gap)
+                    brick.rect.y = 215 + coluna * (y_gap + ALTURA_TIJOLO)
+                    lista_sprites.add(brick)
+                    lista_tijolos.add(brick)
+            if 1 < coluna < 4:
+                if linha == 0:
+                    brick = tijolo.Tijolo(LARANJA, LARGURA_TIJOLO, ALTURA_TIJOLO)
+                    brick.rect.x = LARGURA_PAREDE
+                    brick.rect.y = 215 + coluna * (y_gap + ALTURA_TIJOLO) 
+                    lista_sprites.add(brick)
+                    lista_tijolos.add(brick)
+                else:
+                    brick = tijolo.Tijolo(LARANJA, LARGURA_TIJOLO, ALTURA_TIJOLO)
+                    brick.rect.x = LARGURA_PAREDE + LARGURA_TIJOLO + x_gap + (linha - 1) * (LARGURA_TIJOLO + x_gap)
+                    brick.rect.y = 215 + coluna * (y_gap + ALTURA_TIJOLO) 
+                    lista_sprites.add(brick)
+                    lista_tijolos.add(brick)
+            if 3 < coluna < 6:
+                if linha == 0:
+                    brick = tijolo.Tijolo(VERDE, LARGURA_TIJOLO, ALTURA_TIJOLO)
+                    brick.rect.x = LARGURA_PAREDE
+                    brick.rect.y = 215 + coluna * (y_gap + ALTURA_TIJOLO)
+                    lista_sprites.add(brick)
+                    lista_tijolos.add(brick)
+                else:
+                    brick = tijolo.Tijolo(VERDE, LARGURA_TIJOLO, ALTURA_TIJOLO)
+                    brick.rect.x = LARGURA_PAREDE + LARGURA_TIJOLO + x_gap + (linha - 1) * (LARGURA_TIJOLO + x_gap)
+                    brick.rect.y = 215 + coluna * (y_gap + ALTURA_TIJOLO)
+                    lista_sprites.add(brick)
+                    lista_tijolos.add(brick)
+            if 5 < coluna < 8:
+                if linha == 0:
+                    brick = tijolo.Tijolo(AMARELO, LARGURA_TIJOLO, ALTURA_TIJOLO)
+                    brick.rect.x = LARGURA_PAREDE
+                    brick.rect.y = 215 + coluna * (y_gap + ALTURA_TIJOLO)
+                    lista_sprites.add(brick)
+                    lista_tijolos.add(brick)
+                else:
+                    brick = tijolo.Tijolo(AMARELO, LARGURA_TIJOLO, ALTURA_TIJOLO)
+                    brick.rect.x = LARGURA_PAREDE + LARGURA_TIJOLO + x_gap + (linha - 1) * (LARGURA_TIJOLO + x_gap)
+                    brick.rect.y = 215 + coluna * (y_gap + ALTURA_TIJOLO)
+                    lista_sprites.add(brick)
+                    lista_tijolos.add(brick)
+
+parede_de_tijolos = bricks()
+
+# adicionando as sprites nas listas
 lista_sprites.add(barra)
 lista_sprites.add(bolinha)
-
 
 def main():
     running = True
@@ -113,7 +163,7 @@ def main():
             if event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if btnJogar.collidepoint(event.pos):
-                        jogar(bolas)
+                        jogar(pontuacao, bolas)
                         running = False
                         #print('Botão "jogar" apertado!')
                         # colocar evento para iniciar a partida
@@ -127,14 +177,14 @@ def main():
     pg.quit()
 
 # método 'jogar'
-
-
-def jogar(bolas):
+def jogar(pontuacao, bolinhas):
+    step = 0
+    
     running = True
     clock.tick(FPS)
 
     font = pg.font.Font('assets/minecraft.ttf', 20)
-    string = "bolas : " + str(bolas)
+    string = "bolas : " + str(bolinhas)
     contBolas = font.render(string, True, BRANCO, (0, 0, 0))
     contBolas_posicao = contBolas.get_rect()
     contBolas_posicao.center = (50, 360)
@@ -148,29 +198,29 @@ def jogar(bolas):
                 if event.key == K_ESCAPE:
                     running = False
 
-        lista_sprites.update()
-
         teclas = pg.key.get_pressed()
         if teclas[pg.K_LEFT]:
-            barra.irParaEsquerda(1)
+            barra.irParaEsquerda(2)
         if teclas[pg.K_RIGHT]:
-            barra.irParaDireita(1, X)
+            barra.irParaDireita(2, X)
+
+        lista_sprites.update()
 
         if bolinha.rect.y < 40:
             bolinha.velocity[1] = -bolinha.velocity[1]
 
-        if bolinha.rect.x >= X - wall_width - 10:
+        if bolinha.rect.x >= X - LARGURA_PAREDE - 10:
             bolinha.velocity[0] = -bolinha.velocity[0]
 
-        if bolinha.rect.x <= wall_width:
+        if bolinha.rect.x <= LARGURA_PAREDE:
             bolinha.velocity[0] = -bolinha.velocity[0]
 
         if bolinha.rect.y > Y:
             bolinha.rect.x = X // 2 - 5
             bolinha.rect.y = Y // 2 - 5
             bolinha.velocity[1] = bolinha.velocity[1]
-            bolas += 1
-            if bolas == 4:
+            bolinhas += 1
+            if bolinhas == 4:
                 font = pg.font.Font('assets/minecraft.ttf', 70)
                 text = font.render("Voce perdeu!", 1, VERMELHO)
                 text_rect = text.get_rect(center=(X / 2, Y / 3))
@@ -185,6 +235,34 @@ def jogar(bolas):
             bolinha.rect.x += bolinha.velocity[0]
             bolinha.rect.y -= bolinha.velocity[1]
             bolinha.balancar()
+
+        colisoes_com_tijolo = pg.sprite.spritecollide(bolinha, lista_tijolos, False)
+        for tijolo in colisoes_com_tijolo:
+            bolinha.balancar()
+            if len(colisoes_com_tijolo) > 0:
+                step += 1
+                for i in range (0, 448, 28):
+                    if step == i:
+                        bolinha.velocity[0] += 1
+                        bolinha.velocity[1] += 1
+            if 380.5 > tijolo.rect.y > 338.5:
+                pontuacao += 1 
+                tijolo.kill()
+            elif 338.5 > tijolo.rect.y > 294:
+                pontuacao += 3
+                tijolo.kill()
+            elif 294 > tijolo.rect.y > 254.5:
+                pontuacao += 5
+                tijolo.kill()
+            else:
+                pontuacao += 7
+                tijolo.kill()
+            if len(lista_tijolos) == 0:
+                texto = "Vitória"
+                texto_pontuacao = "Você fez " + pontuacao + " pontos!"
+                ganhou = font.render(texto, True, AZUL, (0, 0, 0))
+                pontos = font.render(texto_pontuacao, True, BRANCO, (0, 0, 0))
+                
 
         pg.draw.line(screen, CINZA, [0, 19], [X, 19], 40)
 
