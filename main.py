@@ -2,15 +2,20 @@ import pygame as pg
 from barrinha import Barrinha
 from bolinha import Bolinha
 from tijolinho import Tijolinho
+import sys
 
-# import time as tm
-# import RPi.GPIO as gp
-# high = gp.HIGH
-# low = gp.LOW
-# p0 = 17
+import time as tm
+import RPi.GPIO as gp
+high = gp.HIGH
+low = gp.LOW
+p0 = 17
+p1 = 18
+p2 = 27
 
-# gp.setmode(gp.BCM)
-# gp.setup(p0, gp.OUT, initial=high)
+gp.setmode(gp.BCM)
+gp.setup(p0, gp.OUT, initial=high)
+gp.setup(p1, gp.OUT, initial=high)
+gp.setup(p2, gp.OUT, initial=high)
 
 pg.init()
 pg.mixer.init()
@@ -117,350 +122,115 @@ lista_sprites.add(bolinha)
 
 cronometro = pg.time.Clock()
 
+pontos = 0
+bolas = 3
+
+
+def jogar():
+
+    global pontos
+    global bolas
+    keys = pg.key.get_pressed()
+    if keys[pg.K_LEFT]:
+        jogador.irEsquerda(5)
+    if keys[pg.K_RIGHT]:
+        jogador.irDireita(5)
+
+    lista_sprites.update()
+
+    if bolinha.rect.x >= 790:
+        bolinha.velocity[0] = -bolinha.velocity[0]
+    if bolinha.rect.x <= 0:
+        bolinha.velocity[0] = -bolinha.velocity[0]
+    if bolinha.rect.y > 590:
+        bolinha.velocity[1] = -bolinha.velocity[1]
+        bolas -= 1
+        if bolas == 2:
+            gp.output(p0, low)
+        elif bolas == 1:
+            gp.output(p1, low)
+        elif bolas == 0:
+            gp.output(p2, low)
+            font = pg.font.Font('assets/bit.ttf', 74)
+            text = font.render("GAME OVER", 1, BRANCO)
+            text_rect = text.get_rect(center=(X / 2, Y / 2))
+            screen.blit(text, text_rect)
+            pg.display.flip()
+            pg.time.wait(3000)
+            pg.quit()
+            sys.exit()
+
+    if bolinha.rect.y < 40:
+        bolinha.velocity[1] = -bolinha.velocity[1]
+
+    if pg.sprite.collide_mask(bolinha, jogador):
+        bolinha.rect.x -= bolinha.velocity[0]
+        bolinha.rect.y -= bolinha.velocity[1]
+        bolinha.bounce()
+
+    lista_colisao_tijolinhos = pg.sprite.spritecollide(
+        bolinha, todos_tijolinhos, False)
+
+    for tijolinho in lista_colisao_tijolinhos:
+        bolinha.bounce()
+        pontos += 1
+        tijolinho.kill()
+        if len(todos_tijolinhos) == 0:
+            font = pg.font.Font('assets/bit.ttf', 74)
+            text = font.render("WIN", 1, BRANCO)
+            text_rect = text.get_rect(center=(X / 2, Y / 2))
+            screen.blit(text, text_rect)
+            pg.display.flip()
+            pg.time.wait(3000)
+
+    screen.fill(PRETO)
+
+    font = pg.font.Font('assets/bit.ttf', 20)
+    text = font.render("Pontos: " + str(pontos), True, BRANCO, (0, 0, 0))
+    screen.blit(text, (20, 360))
+    text = font.render("Vidas: " + str(bolas), True, BRANCO, (0, 0, 0))
+    screen.blit(text, (20, 400))
+
+    lista_sprites.draw(screen)
+    pg.display.flip()
+
+    cronometro.tick(60)
+
+
 def main():
-    jogando = True
-    pontos = 0
-    bolas = 3
 
-    while jogando:
-        screen.fill(PRETO)
+    modo = 'menu'
+    while True:
+        if modo == 'menu':
+            screen.fill(PRETO)
+
+            screen.blit(txtLogo, pLogo)
+            screen.blit(txtJogar, pJogar)
+            screen.blit(txtSair, pSair)
+
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    sys.exit()
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        if btnJogar.collidepoint(event.pos):
+                            modo = 'jogo'
+                        if btnSair.collidepoint(event.pos):
+                            pg.quit()
+                            sys.exit()
+            pg.display.update()
+            pg.display.flip()
+        if modo == 'jogo':
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    sys.exit()
+            jogar()
+
+            pg.display.update()
+            pg.display.flip()
 
-        # screen.blit(txtLogo, pLogo)
-        # screen.blit(txtJogar, pJogar)
-        # screen.blit(txtSair, pSair)
-
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                jogando = False
-            # if event.type == pg.MOUSEBUTTONDOWN:
-            #     if event.button == 1:
-            #         if btnJogar.collidepoint(event.pos):
-            #             jogar(bolas, pontos)
-            #             jogando = False
-            #             #print('Botão "jogar" apertado!')
-            #             # colocar evento para iniciar a partida
-            #         if btnSair.collidepoint(event.pos):
-            #             jogando = False
-
-        keys = pg.key.get_pressed()
-        if keys[pg.K_LEFT]:
-            jogador.irEsquerda(5)
-        if keys[pg.K_RIGHT]:
-            jogador.irDireita(5)
-
-        lista_sprites.update()
-
-        if bolinha.rect.x >= 790:
-            bolinha.velocity[0] = -bolinha.velocity[0]
-        if bolinha.rect.x <= 0:
-            bolinha.velocity[0] = -bolinha.velocity[0]
-        if bolinha.rect.y > 590:
-            bolinha.velocity[1] = -bolinha.velocity[1]
-            bolas -= 1
-            #gp.output(p0, high)
-            if bolas == 0:
-                font = pg.font.Font('assets/bit.ttf', 74)
-                text = font.render("GAME OVER", 1, BRANCO)
-                text_rect = text.get_rect(center=(X / 2, Y / 2))
-                screen.blit(text, text_rect)
-                pg.display.flip()
-                pg.time.wait(3000)
-                jogando = False
-
-        if bolinha.rect.y < 40:
-            bolinha.velocity[1] = -bolinha.velocity[1]
-
-        if pg.sprite.collide_mask(bolinha, jogador):
-            bolinha.rect.x -= bolinha.velocity[0]
-            bolinha.rect.y -= bolinha.velocity[1]
-            bolinha.bounce()
-
-        lista_colisao_tijolinhos = pg.sprite.spritecollide(
-            bolinha, todos_tijolinhos, False)
-
-        for tijolinho in lista_colisao_tijolinhos:
-            bolinha.bounce()
-            pontos += 1
-            tijolinho.kill()
-            if len(todos_tijolinhos) == 0:
-                font = pg.font.Font('assets/bit.ttf', 74)
-                text.font.render("WIN", 1, BRANCO)
-                text_rect = text.get_rect(center=(X / 2, Y / 2))
-                screen.blit(text, text_rect)
-                pg.display.flip()
-                pg.time.wait(3000)
-                jogando = False
-
-        screen.fill(PRETO)
-
-        font = pg.font.Font('assets/bit.ttf', 20)
-        text = font.render("Pontos: " + str(pontos), True, BRANCO, (0, 0, 0))
-        screen.blit(text, (20, 360))
-        text = font.render("Vidas: " + str(bolas), True, BRANCO, (0, 0, 0))
-        screen.blit(text, (20, 400))
-
-        lista_sprites.draw(screen)
-        pg.display.flip()
-
-        cronometro.tick(60)
-
-        pg.display.update()
-       # pg.display.flip()
-
-    # finaliza o pygame
-    pg.quit()
-
-
-# def jogar(bolas, pontos):
-#     # for event in pg.event.get():
-#     #     if event.type == pg.QUIT:
-#     #         jogando = False
-#     jogando = True
-#     while jogando:
-#         keys = pg.key.get_pressed()
-#         if keys[pg.K_LEFT]:
-#             jogador.irEsquerda(5)
-#         if keys[pg.K_RIGHT]:
-#             jogador.irDireita(5)
-
-#         lista_sprites.update()
-
-#         if bolinha.rect.x >= 790:
-#             bolinha.velocity[0] = -bolinha.velocity[0]
-#         if bolinha.rect.x <= 0:
-#             bolinha.velocity[0] = -bolinha.velocity[0]
-#         if bolinha.rect.y > 590:
-#             bolinha.velocity[1] = -bolinha.velocity[1]
-#             bolas -= 1
-#             #gp.output(p0, high)
-#             if bolas == 0:
-#                 font = pg.font.Font('assets/bit.ttf', 74)
-#                 text = font.render("GAME OVER", 1, BRANCO)
-#                 text_rect = text.get_rect(center=(X / 2, Y / 2))
-#                 screen.blit(text, text_rect)
-#                 pg.display.flip()
-#                 pg.time.wait(3000)
-#                 jogando = False
-
-#         if bolinha.rect.y < 40:
-#             bolinha.velocity[1] = -bolinha.velocity[1]
-
-#         if pg.sprite.collide_mask(bolinha, jogador):
-#             bolinha.rect.x -= bolinha.velocity[0]
-#             bolinha.rect.y -= bolinha.velocity[1]
-#             bolinha.bounce()
-
-#         lista_colisao_tijolinhos = pg.sprite.spritecollide(
-#             bolinha, todos_tijolinhos, False)
-
-#         for tijolinho in lista_colisao_tijolinhos:
-#             bolinha.bounce()
-#             pontos += 1
-#             tijolinho.kill()
-#             if len(todos_tijolinhos) == 0:
-#                 font = pg.font.Font('assets/bit.ttf', 74)
-#                 text.font.render("WIN", 1, BRANCO)
-#                 text_rect = text.get_rect(center=(X / 2, Y / 2))
-#                 screen.blit(text, text_rect)
-#                 pg.display.flip()
-#                 pg.time.wait(3000)
-#                 jogando = False
-
-#         screen.fill(PRETO)
-
-#         font = pg.font.Font('assets/bit.ttf', 20)
-#         text = font.render("Pontos: " + str(pontos), True, BRANCO, (0, 0, 0))
-#         screen.blit(text, (20, 360))
-#         text = font.render("Vidas: " + str(bolas), True, BRANCO, (0, 0, 0))
-#         screen.blit(text, (20, 400))
-
-#         lista_sprites.draw(screen)
-#         pg.display.flip()
-
-#         cronometro.tick(60)
-
-
-# def menu(jogando):
-#     screen.fill(PRETO)
-#     screen.blit(txtLogo, pLogo)
-#     screen.blit(txtJogar, pJogar)
-#     screen.blit(txtSair, pSair)
-
-#     for event in pg.event.get():
-#         if event.type == pg.QUIT:
-#             pg.quit()
-#         if event.type == pg.MOUSEBUTTONDOWN:
-#             if event.button == 1:
-#                 if btnJogar.collidepoint(event.pos):
-#                     jogar(jogando, bolas, pontos)
-#                     pg.quit()
-#                 # print('Botão "jogar" apertado!')
-#                 # colocar evento para iniciar a partida
-#                 if btnSair.collidepoint(event.pos):
-#                     pg.quit()
-
-#     pg.display.update()
-#     pg.display.flip()
-
-
-# while jogando:
-#     # menu(jogando)
-#     for event in pg.event.get():
-#         if event.type == pg.QUIT:
-#             jogando = False
-
-#     keys = pg.key.get_pressed()
-#     if keys[pg.K_LEFT]:
-#         jogador.irEsquerda(5)
-#     if keys[pg.K_RIGHT]:
-#         jogador.irDireita(5)
-
-#     lista_sprites.update()
-
-#     if bolinha.rect.x >= 790:
-#         bolinha.velocity[0] = -bolinha.velocity[0]
-#     if bolinha.rect.x <= 0:
-#         bolinha.velocity[0] = -bolinha.velocity[0]
-#     if bolinha.rect.y > 590:
-#         bolinha.velocity[1] = -bolinha.velocity[1]
-#         bolas -= 1
-#         #gp.output(p0, high)
-#         if bolas == 0:
-#             font = pg.font.Font('assets/bit.ttf', 74)
-#             text = font.render("GAME OVER", 1, BRANCO)
-#             text_rect = text.get_rect(center=(X / 2, Y / 2))
-#             screen.blit(text, text_rect)
-#             pg.display.flip()
-#             pg.time.wait(3000)
-#             jogando = False
-
-#     if bolinha.rect.y < 40:
-#         bolinha.velocity[1] = -bolinha.velocity[1]
-
-#     if pg.sprite.collide_mask(bolinha, jogador):
-#         bolinha.rect.x -= bolinha.velocity[0]
-#         bolinha.rect.y -= bolinha.velocity[1]
-#         bolinha.bounce()
-
-#     lista_colisao_tijolinhos = pg.sprite.spritecollide(
-#         bolinha, todos_tijolinhos, False)
-
-#     for tijolinho in lista_colisao_tijolinhos:
-#         bolinha.bounce()
-#         pontos += 1
-#         tijolinho.kill()
-#         if len(todos_tijolinhos) == 0:
-#             font = pg.font.Font('assets/bit.ttf', 74)
-#             text.font.render("WIN", 1, BRANCO)
-#             text_rect = text.get_rect(center=(X / 2, Y / 2))
-#             screen.blit(text, text_rect)
-#             pg.display.flip()
-#             pg.time.wait(3000)
-#             jogando = False
-
-#     screen.fill(PRETO)
-
-#     font = pg.font.Font('assets/bit.ttf', 20)
-#     text = font.render("Pontos: " + str(pontos), True, BRANCO, (0, 0, 0))
-#     screen.blit(text, (20, 360))
-#     text = font.render("Vidas: " + str(bolas), True, BRANCO, (0, 0, 0))
-#     screen.blit(text, (20, 400))
-
-#     lista_sprites.draw(screen)
-#     pg.display.flip()
-
-#     cronometro.tick(60)
-
-# pg.quit()
-
-
-# def menu():
-#     screen.fill(PRETO)
-#     screen.blit(txtLogo, pLogo)
-#     screen.blit(txtJogar, pJogar)
-#     screen.blit(txtSair, pSair)
-
-#     for event in pg.event.get():
-#         if event.type == pg.QUIT:
-#             pg.quit()
-#         if event.type == pg.MOUSEBUTTONDOWN:
-#             if event.button == 1:
-#                 if btnJogar.collidepoint(event.pos):
-#                     jogar(bolas, pontos)
-#                     pg.quit()
-#                 # print('Botão "jogar" apertado!')
-#                 # colocar evento para iniciar a partida
-#                 if btnSair.collidepoint(event.pos):
-#                     pg.quit()
-
-#     pg.display.update()
-#     pg.display.flip()
-
-# finaliza o pygame
-# pg.quit()
-
-
-# def jogar(jogando, bolas, pontos):
-#     keys = pg.key.get_pressed()
-
-#     if keys[pg.K_LEFT]:
-#         jogador.irEsquerda(5)
-
-#     if keys[pg.K_RIGHT]:
-#         jogador.irDireita(5)
-
-#     lista_sprites.update()
-
-#     if bolinha.rect.x >= 790:
-#         bolinha.velocity[0] = -bolinha.velocity[0]
-#     if bolinha.rect.x <= 0:
-#         bolinha.velocity[0] = -bolinha.velocity[0]
-#     if bolinha.rect.y > 590:
-#         bolinha.velocity[1] = -bolinha.velocity[1]
-#         bolas += 1
-#     #gp.output(p0, high)
-#         if bolas == 4:
-#             font = pg.font.Font('assets/bit.ttf', 74)
-#             text = font.render("MORREU :(", 1, BARRINHA)
-#             screen.blit(text, (250, 300))
-#             pg.display.flip()
-#             pg.time.wait(3000)
-#             jogando = False
-
-#     if bolinha.rect.y < 40:
-#         bolinha.velocity[1] = -bolinha.velocity[1]
-
-#     if pg.sprite.collide_mask(bolinha, jogador):
-#         bolinha.rect.x -= bolinha.velocity[0]
-#         bolinha.rect.y -= bolinha.velocity[1]
-#         bolinha.bounce()
-
-#     lista_colisao_tijolinhos = pg.sprite.spritecollide(
-#         bolinha, todos_tijolinhos, False)
-#     for tijolinho in lista_colisao_tijolinhos:
-#         bolinha.bounce()
-#         pontos += 1
-#         tijolinho.kill()
-#         if len(todos_tijolinhos) == 0:
-#             font = pg.font.Font('assets/bit.ttf', 74)
-#             text.font.render("MANDOU MUITO :)", 1, BARRINHA)
-#             screen.blit(text, (200, 300))
-#             pg.display.flip()
-#             pg.time.wait(3000)
-#             jogando = False
-
-#     screen.fill(PRETO)
-
-#     font = pg.font.Font('assets/bit.ttf', 20)
-#     text = font.render("Pontos: " + str(pontos), True, BRANCO, (0, 0, 0))
-#     screen.blit(text, (20, 360))
-#     text = font.render("bolas: " + str(bolas), True, BRANCO, (0, 0, 0))
-#     screen.blit(text, (20, 400))
-
-#     lista_sprites.draw(screen)
-#     pg.display.flip()
-
-#     cronometro.tick(60)
 
 if __name__ == '__main__':
     main()
